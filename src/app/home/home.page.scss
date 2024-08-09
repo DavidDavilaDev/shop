@@ -25,3 +25,44 @@
 #container a {
   text-decoration: none;
 }
+
+ion-avatar {
+  --size: 40px; /* Tamaño de la foto de perfil */
+}
+
+ion-buttons {
+  ion-button {
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+}
+
+/* home.page.scss */
+.button-container {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  margin: 20px 0; /* Ajusta el margen si es necesario */
+}
+
+$color-red: #f96363;
+$color-yellow: #edd968;
+$color-green: #6ae96a;
+$color-blue: #4ba3fc;
+
+.red-border {
+  border: 3px solid $color-red;
+}
+
+.yellow-border {
+  border: 3px solid $color-yellow;
+}
+
+.green-border {
+  border: 3px solid $color-green;
+}
+
+.blue-border {
+  border: 3px solid $color-blue;
+}
+
+

@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditMode ? 'Editar Nota' : 'Agregar Nota' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label position="floating">Título</ion-label>
+    <ion-input [(ngModel)]="noteTitle"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Contenido</ion-label>
+    <ion-textarea [(ngModel)]="noteContent"></ion-textarea>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">
+      (Selecciona un color)
+    </ion-label>
+    <ion-input [(ngModel)]="noteColor" type="color"></ion-input>
+  </ion-item>
+
+  <div class="button-container">
+    <ion-button expand="full" (click)="saveNote()">
+      {{ isEditMode ? 'Guardar Cambios' : 'Agregar Nota' }}
+    </ion-button>
+  </div>
+</ion-content>
