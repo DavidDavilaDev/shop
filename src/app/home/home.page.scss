@@ -44,25 +44,12 @@ ion-buttons {
   margin: 20px 0; /* Ajusta el margen si es necesario */
 }
 
-$color-red: #f96363;
-$color-yellow: #edd968;
-$color-green: #6ae96a;
-$color-blue: #4ba3fc;
-
-.red-border {
-  border: 3px solid $color-red;
+.note-border {
+  height: 5px; /* Adjust the height of the border as needed */
+  width: 100%;
+  margin-bottom: 10px; /* Optional: adds some space between the border and the content */
 }
 
-.yellow-border {
-  border: 3px solid $color-yellow;
-}
 
-.green-border {
-  border: 3px solid $color-green;
-}
-
-.blue-border {
-  border: 3px solid $color-blue;
-}
 
 

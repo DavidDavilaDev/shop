@@ -12,22 +12,23 @@ import { AlertController } from '@ionic/angular';
 export class RegisterPage {
   email!: string;
   password!: string;
+  userName!: string; // Añadir esta línea
 
   constructor(private afAuth: AngularFireAuth, private navCtrl: NavController, private alertCtrl: AlertController, private router: Router) {}
 
   async register() {
-    if (!this.email || !this.password) {
+    if (!this.email || !this.password || !this.userName) { // Verificar que el nombre de usuario no esté vacío
       this.showAlert('Error', 'Todos los campos son obligatorios.');
       return;
     }
 
     try {
-      await this.afAuth.createUserWithEmailAndPassword(this.email, this.password);
-      
+      const userCredential = await this.afAuth.createUserWithEmailAndPassword(this.email, this.password);
+      await userCredential.user?.updateProfile({ displayName: this.userName }); // Actualizar el perfil con el nombre de usuario
+
       this.showAlert('Registro exitoso', 'Tu cuenta ha sido creada. Ahora puedes iniciar sesión.');
-      
       this.router.navigate(['/login']);
-    } catch (error:any) {
+    } catch (error: any) {
       let message: string;
 
       switch (error.code) {
@@ -65,5 +66,4 @@ export class RegisterPage {
   goToLogin() {
     this.router.navigate(['/login']);
   }
-
 }

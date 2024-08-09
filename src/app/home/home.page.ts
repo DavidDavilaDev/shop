@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { ActionSheetController, ModalController } from '@ionic/angular';
 import { NoteModalPage } from '../pages/note-modal/note-modal.page';
 import { ProfileService } from '../services/profile.service';
+import { AlertController } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -26,7 +28,9 @@ export class HomePage implements OnInit, OnDestroy {
     private afAuth: AngularFireAuth,
     private actionSheetController: ActionSheetController,
     private modalController: ModalController,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private alertController: AlertController,
+    private platform: Platform,
   ) {}
 
   ngOnInit() {
@@ -34,12 +38,19 @@ export class HomePage implements OnInit, OnDestroy {
       if (user) {
         this.userPhotoURL = user.photoURL || 'assets/default-profile-pic.jpg';
         this.userName = user.displayName || 'Invitado';
-        this.loadNotes(user.uid);
+        this.loadNotes(user.uid); // Ya tienes el usuario aquí, no necesitas promesa
       } else {
         this.router.navigate(['/login']);
       }
     });
-
+  
+    this.platform.resume.subscribe(async () => {
+      const user = await this.afAuth.currentUser;
+      if (user) {
+        this.loadNotes(user.uid); // Ahora tienes acceso al UID después de resolver la promesa
+      }
+    });
+  
     this.profileSubscription = this.profileService.userProfile$.subscribe(profile => {
       if (profile) {
         this.userPhotoURL = profile.photoURL || 'assets/default-profile-pic.jpg';
@@ -153,12 +164,29 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async deleteNote(noteId: string) {
-    const user = await this.afAuth.currentUser;
-    if (user) {
-      const db = getDatabase();
-      const noteRef = ref(db, `notes/${user.uid}/${noteId}`);
-      await remove(noteRef);
-      this.loadNotes(user.uid); // Recarga las notas después de eliminar
-    }
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que quieres eliminar esta nota?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        }, {
+          text: 'Eliminar',
+          handler: async () => {
+            const user = await this.afAuth.currentUser;
+            if (user) {
+              const db = getDatabase();
+              const noteRef = ref(db, `notes/${user.uid}/${noteId}`);
+              await remove(noteRef);
+              this.loadNotes(user.uid); // Recarga las notas después de eliminar
+            }
+          }
+        }
+      ]
+    });
+  
+    await alert.present();
   }
 }

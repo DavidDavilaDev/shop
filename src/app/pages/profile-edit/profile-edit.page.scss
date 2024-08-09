@@ -1,0 +1,27 @@
+.note-modal-content {
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+  
+  ion-item {
+    margin-bottom: 20px;
+  }
+  
+  ion-label {
+    color: #666; /* Gris para el texto del label */
+  }
+  
+  ion-input, ion-textarea {
+    border-radius: 8px;
+    padding: 10px;
+  }
+  
+  ion-button {
+    --background: #3880ff; /* Color azul para el botón */
+    --border-radius: 8px;
+  }
+  
+  .button-container {
+    padding-top: 20px;
+  }
+  
