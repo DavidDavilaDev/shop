@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ product ? 'Editar Producto' : 'Agregar Producto' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Nombre del Producto</ion-label>
+      <ion-input [(ngModel)]="productName" placeholder="Nombre del Producto"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Descripción</ion-label>
+      <ion-textarea [(ngModel)]="productDescription" placeholder="Descripción del Producto"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Precio</ion-label>
+      <ion-input type="number" [(ngModel)]="productPrice" placeholder="Precio del Producto"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Imagen del Producto</ion-label>
+      <input type="file" (change)="onFileSelected($event)">
+    </ion-item>
+
+    <ion-item *ngIf="productImage">
+      <img [src]="productImage" alt="Imagen del producto" style="width: 100%;">
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="saveProduct()">
+    {{ product ? 'Guardar Cambios' : 'Agregar Producto' }}
+  </ion-button>
+</ion-content>

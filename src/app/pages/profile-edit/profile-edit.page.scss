@@ -17,8 +17,12 @@
   }
   
   ion-button {
-    --background: #3880ff; /* Color azul para el botón */
+    --background: #6f00ff; /* Color azul para el botón */
     --border-radius: 8px;
+  }
+
+  .delete {
+    --background: #b1b1b1;
   }
   
   .button-container {

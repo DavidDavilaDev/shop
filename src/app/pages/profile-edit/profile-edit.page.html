@@ -15,13 +15,21 @@
   </ion-item>
   
   <ion-item>
-    <ion-label>Foto de Perfil</ion-label>
-    <input type="file" (change)="handleFileInput($event)">
-    <ion-img [src]="photoURL" *ngIf="photoURL" style="width: 100px; height: 100px; object-fit: cover;"></ion-img>
+    <ion-label position="floating">Nueva Contraseña</ion-label>
+    <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="newPassword"></ion-input>
+    <ion-button fill="clear" slot="end" (click)="togglePasswordVisibility()">
+      <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off' : 'eye'" color="light"></ion-icon>
+    </ion-button>
+  </ion-item>
+  
+  <ion-item>
+    <ion-label position="floating">Confirmar Contraseña</ion-label>
+    <ion-input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword"></ion-input>
+    <ion-button fill="clear" slot="end" (click)="togglePasswordVisibility()" style="width: auto;">
+      <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off' : 'eye'" color="light"></ion-icon>
+    </ion-button>
   </ion-item>
 
-  <ion-button style="width: 100%;" color="primary" (click)="takePhoto()">Tomar foto</ion-button>
-
-  <ion-button style="width: 100%; border-radius: 5px;" color="secondary" (click)="updateProfile()">Actualizar</ion-button>
-  <ion-button style="width: 100%; border-radius: 5px;" color="danger" (click)="goToHome()">Cancelar</ion-button>
+  <ion-button style="width: 100%; border-radius: 5px;" (click)="updateProfile()">Actualizar</ion-button>
+  <ion-button class="delete" style="width: 100%; border-radius: 5px;" (click)="goToHome()">Cancelar</ion-button>
 </ion-content>

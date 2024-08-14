@@ -2,38 +2,45 @@
   <ion-toolbar>
     <ion-title>Inicio</ion-title>
     <ion-buttons slot="end">
-      <ion-title>{{ userName }}</ion-title>
-      <ion-avatar (click)="presentActionSheet()">
-        <img [src]="userPhotoURL || 'assets/default-profile-pic.jpg'" />
-      </ion-avatar>
+      <ion-button (click)="presentActionSheet()">Editar Perfil</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="button-container">
-    <ion-button (click)="openNoteModal()">Agregar Nota</ion-button>
+  <div class="button-container" style="width: 100%;">
+    <ion-button (click)="openProductModal()">
+      Agregar Producto
+      <ion-icon name="cart-outline" slot="start"></ion-icon>
+    </ion-button>
   </div>
-
-  <!-- Display Existing Notes -->
+  
+  <!-- Search Bar -->
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterProducts()" placeholder="Buscar productos"></ion-searchbar>
+  
+  <!-- Display Existing Products -->
   <ion-grid>
     <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let note of notes">
-        <ion-card >
-          <div class="note-border" [style.background-color]="note.color"></div>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let product of filteredProducts">
+        <ion-card>
+          <div></div>
           <ion-card-header>
-            <ion-card-title>{{ note.title }}</ion-card-title>
-            <ion-card-subtitle>{{ note.timestamp | date:'short' }}</ion-card-subtitle>
+            <ion-card-title>{{ product.name }}</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <p>{{ note.content }}</p>
+            <p>Precio: $ {{ product.price }}</p>
+            <p>Descripción: {{ product.description }}</p>
+            
+            <!-- Mostrar imagen del producto con tamaño reducido -->
+            <img *ngIf="product.imageURL" [src]="product.imageURL" alt="Imagen del producto" style="width: 50%; margin: 10px auto; display: block;">
+            
             <br>
-            <ion-button (click)="editNote(note)">
-              <ion-icon name="create-outline"></ion-icon>
+            <ion-button expand="block" (click)="editProduct(product)">
+              Editar
             </ion-button>
             
-            <ion-button color="danger" (click)="deleteNote(note.id)">
-              <ion-icon name="trash-outline"></ion-icon>
+            <ion-button expand="block" class="delete" (click)="deleteProduct(product.id)">
+              Eliminar
             </ion-button>
             
           </ion-card-content>

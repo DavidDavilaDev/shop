@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoteModalPage } from './note-modal.page';
+import { ProductModalPage } from './product-modal.page';
 
-describe('NoteModalPage', () => {
-  let component: NoteModalPage;
-  let fixture: ComponentFixture<NoteModalPage>;
+describe('ProductModalPage', () => {
+  let component: ProductModalPage;
+  let fixture: ComponentFixture<ProductModalPage>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NoteModalPage);
+    fixture = TestBed.createComponent(ProductModalPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

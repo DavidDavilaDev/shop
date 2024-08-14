@@ -4,10 +4,11 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { getDatabase, ref, set, push, onValue, remove, DataSnapshot } from 'firebase/database';
 import { Subscription } from 'rxjs';
 import { ActionSheetController, ModalController } from '@ionic/angular';
-import { NoteModalPage } from '../pages/note-modal/note-modal.page';
+import { ProductModalPage } from '../pages/product-modal/product-modal.page';  // Asegúrate de crear una página de modal para productos
 import { ProfileService } from '../services/profile.service';
 import { AlertController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-home',
@@ -17,12 +18,14 @@ import { Platform } from '@ionic/angular';
 export class HomePage implements OnInit, OnDestroy {
   userPhotoURL: string | null = null;
   userName: string | null = null;
-  notes: any[] = [];
+  products: any[] = [];
   private authSubscription: Subscription | undefined;
   private profileSubscription: Subscription | undefined;
-  noteTitle: any;
-  noteContent: any;
-  
+  productName: any;
+  productDescription: any;
+  filteredProducts: any[] = [];
+  searchTerm: any;
+
   constructor(
     private router: Router,
     private afAuth: AngularFireAuth,
@@ -31,14 +34,16 @@ export class HomePage implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private alertController: AlertController,
     private platform: Platform,
-  ) {}
+  ) {
+    this.filteredProducts = [...this.products];
+  }
 
   ngOnInit() {
     this.authSubscription = this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userPhotoURL = user.photoURL || 'assets/default-profile-pic.jpg';
         this.userName = user.displayName || 'Invitado';
-        this.loadNotes(user.uid); // Ya tienes el usuario aquí, no necesitas promesa
+        this.loadProducts(user.uid);
       } else {
         this.router.navigate(['/login']);
       }
@@ -47,7 +52,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.platform.resume.subscribe(async () => {
       const user = await this.afAuth.currentUser;
       if (user) {
-        this.loadNotes(user.uid); // Ahora tienes acceso al UID después de resolver la promesa
+        this.loadProducts(user.uid);
       }
     });
   
@@ -66,6 +71,12 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.profileSubscription) {
       this.profileSubscription.unsubscribe();
     }
+  }
+
+  filterProducts() {
+    this.filteredProducts = this.products.filter(product => 
+      product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
   }
 
   async presentActionSheet() {
@@ -104,69 +115,73 @@ export class HomePage implements OnInit, OnDestroy {
   async logout() {
     try {
       await this.afAuth.signOut();
+      await Haptics.notification({ type: NotificationType.Success });
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Error signing out:', error);
     }
   }
 
-  async addNote() {
+  async addProduct() {
     const user = await this.afAuth.currentUser;
     if (user) {
       const db = getDatabase();
-      const noteRef = ref(db, `notes/${user.uid}`);
-      const newNoteRef = push(noteRef);
-      const note = {
-        title: this.noteTitle,
-        content: this.noteContent,
+      const productRef = ref(db, `products/${user.uid}`);
+      const newProductRef = push(productRef);
+      const product = {
+        name: this.productName,
+        description: this.productDescription,
         userId: user.uid,
         timestamp: new Date().toISOString()
       };
 
-      set(newNoteRef, note).then(() => {
-        this.noteTitle = '';
-        this.noteContent = '';
-        this.loadNotes(user.uid);
+      set(newProductRef, product).then(() => {
+        this.productName = '';
+        this.productDescription = '';
+        this.loadProducts(user.uid);
+        Haptics.impact({ style: ImpactStyle.Medium });
       }).catch(error => {
-        console.error('Error adding note:', error);
+        console.error('Error adding product:', error);
       });
     }
   }
 
-  loadNotes(userId: string) {
+  loadProducts(userId: string) {
     const db = getDatabase();
-    const notesRef = ref(db, `notes/${userId}`);
-    onValue(notesRef, (snapshot: DataSnapshot) => {
+    const productsRef = ref(db, `products/${userId}`);
+    onValue(productsRef, (snapshot: DataSnapshot) => {
       const data = snapshot.val();
-      this.notes = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+      this.products = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+      this.filteredProducts = [...this.products]; // Asegúrate de que filteredProducts también se actualice
+      console.log('Products loaded:', this.products); // Verifica los datos cargados
     });
   }
 
-  async openNoteModal() {
+  async openProductModal() {
     const modal = await this.modalController.create({
-      component: NoteModalPage
+      component: ProductModalPage  // Reemplaza NoteModalPage con ProductModalPage
     });
     modal.onDidDismiss().then(() => {
-      this.ngOnInit(); // Refresh notes after modal is dismissed
+      this.ngOnInit(); // Refresh products after modal is dismissed
     });
     return await modal.present();
   }
 
-  async editNote(note: any) {
+  async editProduct(product: any) {
     const modal = await this.modalController.create({
-      component: NoteModalPage,
-      componentProps: { note }
+      component: ProductModalPage,
+      componentProps: { product }
     });
     modal.onDidDismiss().then(() => {
-      this.ngOnInit(); // Refresh notes after modal is dismissed
+      this.ngOnInit(); // Refresh products after modal is dismissed
     });
     return await modal.present();
   }
 
-  async deleteNote(noteId: string) {
+  async deleteProduct(productId: string) {
     const alert = await this.alertController.create({
       header: 'Confirmar eliminación',
-      message: '¿Estás seguro de que quieres eliminar esta nota?',
+      message: '¿Estás seguro de que quieres eliminar este producto?',
       buttons: [
         {
           text: 'Cancelar',
@@ -178,9 +193,10 @@ export class HomePage implements OnInit, OnDestroy {
             const user = await this.afAuth.currentUser;
             if (user) {
               const db = getDatabase();
-              const noteRef = ref(db, `notes/${user.uid}/${noteId}`);
-              await remove(noteRef);
-              this.loadNotes(user.uid); // Recarga las notas después de eliminar
+              const productRef = ref(db, `products/${user.uid}/${productId}`);
+              await remove(productRef);
+              this.loadProducts(user.uid); // Recarga los productos después de eliminar
+              Haptics.notification({ type: NotificationType.Error });
             }
           }
         }

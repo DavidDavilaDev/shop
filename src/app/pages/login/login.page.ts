@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-login',
@@ -20,14 +21,16 @@ export class LoginPage {
 
   async login() {
     if (!this.email || !this.password) {
-      this.showAlert('Error', 'Todos los campos son obligatorios.');
+      await this.showAlert('Error', 'Todos los campos son obligatorios.');
+      await Haptics.notification({ type: NotificationType.Error });
       return;
     }
 
     try {
       const user = await this.afAuth.signInWithEmailAndPassword(this.email, this.password);
       if (user) {
-        this.showAlert('Inicio de sesión exitoso', 'Has iniciado sesión correctamente.');
+        await this.showAlert('Inicio de sesión exitoso', 'Has iniciado sesión correctamente.');
+        await Haptics.notification({ type: NotificationType.Success });
         this.router.navigate(['/home']);
       }
     } catch (error: any) {
@@ -51,7 +54,8 @@ export class LoginPage {
           break;
       }
 
-      this.showAlert('Error de inicio de sesión', message);
+      await this.showAlert('Error de inicio de sesión', message);
+      await Haptics.notification({ type: NotificationType.Error });
     }
   }
 

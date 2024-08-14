@@ -3,6 +3,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-register',
@@ -12,21 +13,27 @@ import { AlertController } from '@ionic/angular';
 export class RegisterPage {
   email!: string;
   password!: string;
-  userName!: string; // Añadir esta línea
+  userName!: string;
 
-  constructor(private afAuth: AngularFireAuth, private navCtrl: NavController, private alertCtrl: AlertController, private router: Router) {}
+  constructor(
+    private afAuth: AngularFireAuth,
+    private navCtrl: NavController,
+    private alertCtrl: AlertController,
+    private router: Router
+  ) {}
 
   async register() {
-    if (!this.email || !this.password || !this.userName) { // Verificar que el nombre de usuario no esté vacío
-      this.showAlert('Error', 'Todos los campos son obligatorios.');
+    if (!this.email || !this.password || !this.userName) {
+      await this.showAlert('Error', 'Todos los campos son obligatorios.');
       return;
     }
 
     try {
       const userCredential = await this.afAuth.createUserWithEmailAndPassword(this.email, this.password);
-      await userCredential.user?.updateProfile({ displayName: this.userName }); // Actualizar el perfil con el nombre de usuario
+      await userCredential.user?.updateProfile({ displayName: this.userName });
 
-      this.showAlert('Registro exitoso', 'Tu cuenta ha sido creada. Ahora puedes iniciar sesión.');
+      await this.showAlert('Registro exitoso', 'Tu cuenta ha sido creada. Ahora puedes iniciar sesión.');
+      await Haptics.notification({ type: NotificationType.Success });
       this.router.navigate(['/login']);
     } catch (error: any) {
       let message: string;
@@ -49,7 +56,8 @@ export class RegisterPage {
           break;
       }
 
-      this.showAlert('Error de registro', message);
+      await this.showAlert('Error de registro', message);
+      await Haptics.notification({ type: NotificationType.Error });
     }
   }
 

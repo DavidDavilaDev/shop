@@ -14,8 +14,8 @@ const routes: Routes = [
     loadChildren: () => import('./pages/profile-edit/profile-edit.module').then( m => m.ProfileEditPageModule)
   },
   {
-    path: 'note-modal',
-    loadChildren: () => import('./pages/note-modal/note-modal.module').then( m => m.NoteModalPageModule)
+    path: 'product-modal',
+    loadChildren: () => import('./pages/product-modal/product-modal.module').then( m => m.ProductModalPageModule)
   },
 ];
 
