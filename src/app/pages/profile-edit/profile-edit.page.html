@@ -17,9 +17,6 @@
   <ion-item>
     <ion-label position="floating">Nueva Contraseña</ion-label>
     <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="newPassword"></ion-input>
-    <ion-button fill="clear" slot="end" (click)="togglePasswordVisibility()">
-      <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off' : 'eye'" color="light"></ion-icon>
-    </ion-button>
   </ion-item>
   
   <ion-item>
